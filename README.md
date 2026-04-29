@@ -1,19 +1,18 @@
 # Kimi Agent Cluster — AI协作规范治理方案
 
 > 从复杂度失控到极简治理的完整方案
-> 目标：82条规则 → 15条规则，12个文件 → 8个文件
+> V2新增: 规则可视化 + 三门控流程 + 工具链优化
 
 ---
 
-## 项目背景
+## 快速导航
 
-这是对 [AI_Hcy](https://github.com/hcy19940819/AI_Hcy) 仓库AI协作规范体系的全面诊断和重构方案。
-
-**问题**：规范复杂度失控（84.5KB / 82条规则 / 12个文件），导致规则遗漏频发。
-
-**根因**：陷入了"规则越多→遗漏越多→问题越多→规则更多"的恶性循环。
-
-**方案**：三层治理架构，用"更少但更强的约束 + 自动化"打破循环。
+| 你想解决什么问题 | 先看哪个文件 |
+|-----------------|-------------|
+| **规则自行膨胀、AI擅自添加规则** | `v2/GOVERNANCE-V2-FULL.md` → 第二部分 |
+| **需求不明确就执行、臆测需求** | `v2/GOVERNANCE-V2-FULL.md` → 第三部分 |
+| **Kimi Code不好用、工具优化** | `v2/GOVERNANCE-V2-FULL.md` → 第四部分 |
+| **一站式完整方案（推荐）** | `v2/GOVERNANCE-V2-FULL.md` |
 
 ---
 
@@ -21,90 +20,79 @@
 
 ```
 kimi-agent-cluster/
-├── README.md                          # 本文件
+├── README.md                           # 本文件
 │
-├── 📋 AI_Hcy_复杂度治理方案.md          # ⭐ 主方案文档（一站式阅读）
-├── 📊 diagnosis-report.md             # 诊断报告（82条规则的全量分析）
-├── 🗺️ migration-plan.md              # 6阶段迁移计划
+# ===== V1: 架构治理方案 =====
+├── PROPOSAL.md                         # V1主方案（原中文文件名）
+├── diagnosis-report.md                 # V1诊断报告
+├── migration-plan.md                   # V1迁移计划
 │
-├── docs/                              # 详细设计文档
-│   ├── 00-ARCHITECTURE-OVERVIEW.md    # 新架构总览
-│   ├── 01-MEMORY-COMPRESSION.md      # MEMORY.md 15KB→1KB压缩方案
-│   ├── 02-MIGRATION-GUIDE.md         # 迁移实施指南
-│   ├── 03-RULE-MAPPING.md            # 60+条→15条完整映射表
-│   └── 04-AUTOMATION-SCRIPTS.md      # 3个自动化脚本完整代码
+├── docs/                               # V1详细设计文档
+│   ├── 00-ARCHITECTURE-OVERVIEW.md
+│   ├── 01-MEMORY-COMPRESSION.md
+│   ├── 02-MIGRATION-GUIDE.md
+│   ├── 03-RULE-MAPPING.md
+│   └── 04-AUTOMATION-SCRIPTS.md
 │
-└── templates/                         # 新架构文件模板
-    ├── META.md                        # 元规则 + 执行规则（~2KB）
-    ├── CONTEXT.md                     # 项目快照（<1KB）
-    ├── SKILLS.md                      # 技能索引表（<2KB）
-    └── playbook/                      # 场景手册
-        ├── start.md                   # 会话启动（3步）
-        ├── develop.md                 # 开发工作流
-        ├── submit.md                  # 提交验证
-        └── incident.md               # 事故处理（P0收敛处）
+├── templates/                          # V1文件模板
+│   ├── META.md
+│   ├── CONTEXT.md
+│   ├── SKILLS.md
+│   └── playbook/
+│       ├── start.md
+│       ├── develop.md
+│       ├── submit.md
+│       └── incident.md
+│
+# ===== V2: 完整治理 + 流程 + 工具 =====
+├── v2/
+│   ├── GOVERNANCE-V2-FULL.md           # ⭐ V2完整方案（一站式阅读）
+│   ├── RULES-GOVERNANCE-GUIDE.md       # 规则可视化 + 变更确认详细指南
+│   ├── ai-collaboration-three-gate-process.md  # 三门控流程完整文档
+│   ├── kimi26_toolchain_guide.md       # Kimi2.6工具链完全指南
+│   ├── RULES-GOVERNANCE.md             # 可直接使用的规则看板模板
+│   ├── RULES-CHANGELOG.md              # 可直接使用的变更日志模板
+│   └── RULES-PROPOSAL-TEMPLATE.md      # 可直接使用的变更提案模板
 ```
 
 ---
 
-## 核心数字
+## V2 核心内容概览
 
-| 指标 | 旧架构 | 新架构 | 改善 |
-|------|--------|--------|------|
-| 规则总数 | **82条** | ≤20条 | -75% |
-| 规范文件 | **12个** | 8个 | -33% |
-| 规范总量 | **84.5KB** | ~20KB | -76% |
-| 综合评分 | **43.4/100** | >80 | +84% |
-| 自动化覆盖率 | ~10% | ~53% | +430% |
+### Q1: 规则可视化 + 变更确认
 
----
+- **三层金字塔**: 元规则(3条) / 执行规则(10条) / 场景规则(10条)，上限20条
+- **可视化看板**: `RULES-GOVERNANCE.md` — 打开即看规则全貌
+- **变更确认流程**: AI提案 → 你审批（同意/试运行/否决） → AI执行
+- **AI红线**: 禁止先斩后奏、禁止默认同意、禁止拆分规避
+- **三级告警**: 🟡警告(16条) → 🟠紧急(19条) → 🔴超标(>20条)
 
-## 三层治理架构
+### Q2: 需求 → 方案 → 执行 三门控
 
 ```
-┌─────────────────────────────────────┐
-│  Layer 1: META.md — 元规则层         │
-│  5条元规则 + 15条执行规则             │
-│  ★ 唯一可信来源                      │
-├─────────────────────────────────────┤
-│  Layer 2: CONTEXT.md — 上下文层      │
-│  我是谁 + 现在在哪 + 当前任务          │
-├─────────────────────────────────────┤
-│  Layer 3: playbook/*.md — 场景层     │
-│  启动 / 开发 / 提交 / 事故            │
-│  需要时才加载                        │
-└─────────────────────────────────────┘
+用户输入 → Gate1 需求确认 → Gate2 方案评审 → Gate3 执行验证 → 关闭
+              │                 │                 │
+           REQ文档          DES文档          VER文档
+           (你确认)          (你批准)         (你验收)
 ```
 
----
+- **Gate 1**: AI只做需求分析师，理解记录不编码
+- **Gate 2**: AI只做方案设计师，出方案不编码
+- **Gate 3**: AI按方案执行，完成后自检提交验证
+- **违规处理**: VIO-01~VIO-07，违规立即停止回流
 
-## 5条元规则（永远不变）
+### Q3: 工具链优化
 
-1. **单一来源** — 一个规则只存在于一个地方
-2. **场景驱动** — 按使用场景组织，不按文件类型
-3. **自动化优先** — 能脚本化的绝不靠人记
-4. **约束有界** — 核心规则≤15条，新增必须淘汰旧规则
-5. **经验≠规则** — 教训不能自动升级为规则
-
----
-
-## 快速开始
-
-**阅读顺序**：
-1. [AI_Hcy_复杂度治理方案.md](AI_Hcy_复杂度治理方案.md) — 完整方案（15分钟）
-2. [docs/00-ARCHITECTURE-OVERVIEW.md](docs/00-ARCHITECTURE-OVERVIEW.md) — 架构细节
-3. [migration-plan.md](migration-plan.md) — 如何落地
-
-**想直接使用模板**：
-- [templates/META.md](templates/META.md) — 复制到你的仓库根目录
-- [templates/CONTEXT.md](templates/CONTEXT.md) — 修改项目信息
-- [templates/playbook/](templates/playbook/) — 复制playbook目录
+- **立即迁移**: Kimi Code → Trae国内版（10分钟，免费，中文原生）
+- **核心模型**: Kimi K2.6（代码编写 + 方案设计）
+- **辅助模型**: Kimi K2.5（测试 + 文档，成本更低）
+- **Prompt最佳实践**: 四段式写法 + 长上下文利用 + 前缀缓存
 
 ---
 
 ## 生成信息
 
-- **诊断日期**: 2026-04-29
+- **V1日期**: 2026-04-29（架构治理方案）
+- **V2日期**: 2026-04-29（完整治理 + 流程 + 工具）
 - **诊断对象**: hcy19940819/AI_Hcy
-- **生成方式**: 多Agent协作（诊断Agent + 架构设计Agent + 迁移规划Agent）
-- **综合评级**: C(中度风险) → 目标 A(健康)
+- **生成方式**: 多Agent协作（规则治理Agent + 流程门控Agent + 工具链Agent）
